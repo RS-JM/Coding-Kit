@@ -1,6 +1,6 @@
 # PROJ-4: Interaktiver Kalender
 
-## Status: 🔵 Planned
+## Status: 🟢 In Development
 
 ## Beschreibung
 Monatskalender-Ansicht im Dashboard mit Navigation zwischen Monaten und Rechtsklick-Kontextmenue auf einzelnen Tagen. Zeigt vorhandene Eintraege (Arbeitsstunden, Urlaub, Krankheit) farblich markiert an.
@@ -75,3 +75,37 @@ Als Mitarbeiter moechte ich farbliche Markierungen im Kalender sehen, um auf ein
 - shadcn/ui Tooltip fuer Hover-Details
 - Daten ueber API laden (time_entries, vacation_requests, sick_leaves)
 - Desktop-first Layout, Kalender nimmt den groessten Bereich ein
+
+## Tech-Design (Solution Architect)
+
+### Component-Struktur
+```
+Dashboard (page.tsx)
+└── MonthCalendar (Client Component)
+    ├── Header: Monatsname + Jahr
+    │   ├── "←" Vorheriger Monat
+    │   ├── "Heute" Button
+    │   └── "→" Nächster Monat
+    ├── Wochentag-Header (Mo Di Mi Do Fr Sa So)
+    └── Tages-Grid (6 × 7 Zellen)
+        └── Tageszelle
+            ├── Tagesnummer
+            ├── Farbmarkierung (wenn Eintrag vorhanden)
+            └── Rechtsklick → Kontextmenü
+                ├── "Arbeitszeit erfassen" (→ PROJ-5)
+                ├── "Krankmeldung eintragen" (→ PROJ-9)
+                └── "Urlaub beantragen" (→ PROJ-7)
+```
+
+### Daten-Model
+Keine neuen Tabellen — Datentabellen (time_entries, vacation_requests, sick_leaves) kommen in PROJ-5/7/9. Kalender zeigt initial leere Tage, Farbmarkierungen erscheinen automatisch wenn Daten existieren.
+
+### Tech-Entscheidungen
+- Eigene Kalender-Komponente (shadcn Calendar ist ein Datumspicker, kein Monatskalender)
+- Client Component (State für Monat-Navigation + Event-Handler)
+- shadcn ContextMenu für Rechtsklick-Menü
+- Kontextmenü-Aktionen sind vorerst Platzhalter (Toast) — werden in PROJ-5/7/9 verbunden
+
+### Dependencies
+- shadcn/ui context-menu (neu installiert)
+- Sonst keine neuen Packages

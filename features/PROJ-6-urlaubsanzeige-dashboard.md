@@ -1,6 +1,6 @@
 # PROJ-6: Urlaubsanzeige im Dashboard
 
-## Status: 🔵 Planned
+## Status: 🟢 In Development
 
 ## Beschreibung
 Widget im Dashboard, das die genommenen und verbleibenden Urlaubstage fuer das aktuelle Jahr anzeigt. Zeigt einen Fortschrittsbalken und separate Anzeige fuer beantragte (noch nicht genehmigte) Tage.
@@ -58,3 +58,29 @@ Als Mitarbeiter moechte ich sehen, wie viele Tage aktuell beantragt (aber noch n
 - shadcn/ui Badge fuer Status-Anzeige
 - Daten ueber API abrufen: genehmigte + beantragte Urlaubstage
 - Berechnung: genommen = Summe genehmigter Urlaubstage im aktuellen Jahr
+
+## Tech-Design (Solution Architect)
+
+### Component-Struktur
+```
+Dashboard (page.tsx)
+└── VacationWidget (Server Component, Props von page.tsx)
+    ├── Titel: "Urlaub" + Palmtree-Icon
+    ├── Große Zahl: "X Tage verbleibend"
+    ├── Fortschrittsbalken (farbig je nach Verbrauch)
+    ├── Detail: "X von Y genommen"
+    └── Beantragt: "X Tage beantragt" (wenn > 0)
+```
+
+### Daten-Model
+- urlaubstage_gesamt aus profiles-Tabelle (existiert bereits)
+- Genommene + beantragte Tage: initial 0 (Tabellen kommen in PROJ-7/8)
+- Widget zeigt sofort korrekte Gesamttage
+
+### Tech-Entscheidungen
+- Server Component (keine Client-Interaktivität nötig)
+- Props: urlaubstageGesamt, urlaubstageGenommen, urlaubstageBeantragt
+- Eigener Fortschrittsbalken mit Farblogik (<70% grün, 70-90% orange, >90% rot)
+
+### Dependencies
+Keine neuen Packages

@@ -2,9 +2,11 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { UserMenu } from '@/components/user-menu'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Calendar, Palmtree, Clock, ClipboardList, FolderOpen, History, LayoutDashboard, Users, ShieldCheck } from 'lucide-react'
+import { MonthCalendar } from '@/components/month-calendar'
+import { VacationWidget } from '@/components/vacation-widget'
+import { Calendar, Clock, ClipboardList, FolderOpen, History, LayoutDashboard, Users, ShieldCheck } from 'lucide-react'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -39,7 +41,7 @@ export default async function DashboardPage() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('vorname, nachname, job_titel, rolle')
+    .select('vorname, nachname, job_titel, rolle, urlaubstage_gesamt')
     .eq('id', user.id)
     .single()
 
@@ -182,35 +184,12 @@ export default async function DashboardPage() {
 
           {/* Dashboard Grid: Kalender ~80% | Urlaub-Widget ~20% */}
           <div className="grid gap-6 xl:grid-cols-5">
-            {/* Kalender-Platzhalter */}
-            <Card className="xl:col-span-4">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Kalender
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-96 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
-                  <p>Kalender wird in PROJ-4 implementiert</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Urlaub-Widget (rechte Spalte, ~20%) */}
-            <Card className="xl:col-span-1">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Palmtree className="h-4 w-4" />
-                  Urlaub
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-32 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
-                  <p className="text-center text-sm">Urlaubsanzeige kommt in PROJ-6</p>
-                </div>
-              </CardContent>
-            </Card>
+            <MonthCalendar />
+            <VacationWidget
+              urlaubstageGesamt={profile?.urlaubstage_gesamt ?? 30}
+              urlaubstageGenommen={0}
+              urlaubstageBeantragt={0}
+            />
           </div>
         </main>
       </div>
