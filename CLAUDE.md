@@ -58,9 +58,17 @@ Employee time tracking app with 3 roles: **Mitarbeiter** (employee), **Manager**
 - Agents are prompt templates (not registered Skills) — read the agent file, then follow its instructions
 - `PROJECT_CONTEXT.md` tracks the feature roadmap and project status
 
+### Dashboard Architecture
+
+- **Header:** Logo + title, date/role badge, user name + avatar with dropdown menu (Profil, Einstellungen, Abmelden)
+- **Left sidebar:** Navigation links (Timesheet, Kalender, Akten, Historie) — fixed width, hidden on mobile
+- **Main content:** Grid layout with calendar (~80%) and Urlaub widget (~20%)
+- **Components:** `UserMenu` (client, avatar dropdown), dashboard page is a Server Component
+- Greeting changes by time of day (Guten Morgen/Tag/Abend)
+
 ### Current Status
 
-PROJ-1 (Auth) and PROJ-2 (Roles) are implemented. Next: PROJ-3 (Dashboard Layout).
+PROJ-1 (Auth) and PROJ-2 (Roles) are implemented. PROJ-3 (Dashboard Layout) is in development. Next: PROJ-4 (Calendar) + PROJ-6 (Vacation display).
 
 Implementation order: `PROJ-1 → PROJ-2 → PROJ-3 → PROJ-4 + PROJ-6 → PROJ-5 → PROJ-7 → PROJ-8 → PROJ-9 → PROJ-10`
 

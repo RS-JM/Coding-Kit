@@ -1,6 +1,6 @@
 # PROJ-3: Dashboard-Layout und Benutzerinfo
 
-## Status: 🔵 Planned
+## Status: 🟢 In Development
 
 ## Beschreibung
 Haupt-Dashboard-Screen nach dem Login. Zeigt den eingeloggten Benutzer (Name, Job-Titel), einen Logout-Button und das Grundlayout mit Platzhaltern fuer Kalender und Widgets.
@@ -66,3 +66,36 @@ Als Mitarbeiter moechte ich ein uebersichtliches Dashboard mit klarer Struktur, 
 - Profildaten ueber API abrufen (PROJ-2)
 - Desktop-first, responsive breakpoints beachten
 - Layout dient als Shell fuer alle weiteren Dashboard-Features
+
+## Tech-Design (Solution Architect)
+
+### Component-Struktur
+```
+Dashboard-Layout (/)
+├── Header (oben, volle Breite)
+│   ├── Logo/Titel "Zeiterfassung" (links)
+│   └── Benutzer-Bereich (rechts)
+│       ├── Avatar mit Initialen (z.B. "MK")
+│       ├── Name + Job-Titel + Rollen-Badge
+│       └── Logout-Button
+│
+└── Content-Bereich (darunter)
+    ├── Begrüßung ("Guten Morgen, Max")
+    ├── Kalender-Platzhalter (~2/3 Breite)
+    │   └── Card mit Hinweis auf PROJ-4
+    └── Sidebar-Widgets (~1/3 Breite)
+        ├── Urlaubsanzeige-Platzhalter (PROJ-6)
+        └── Schnell-Info (heutiges Datum)
+```
+
+### Daten-Model
+Keine neuen Daten — nutzt bestehende `profiles`-Tabelle (Vorname, Nachname, Job-Titel, Rolle).
+
+### Tech-Entscheidungen
+- Server Component beibehalten (Profildaten serverseitig laden)
+- Avatar mit Initialen statt Profilbild (kein Upload nötig)
+- CSS Grid für 2-Spalten-Layout (responsive: stapelt sich auf Mobile)
+- Tageszeit-Begrüßung ("Guten Morgen/Tag/Abend")
+
+### Dependencies
+Keine neuen Packages — alle shadcn/ui-Komponenten bereits installiert.
