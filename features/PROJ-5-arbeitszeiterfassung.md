@@ -1,0 +1,78 @@
+# PROJ-5: Arbeitszeiterfassung
+
+## Status: 🔵 Planned
+
+## Beschreibung
+Formular zum Erfassen der taeglichen Arbeitsstunden (Gesamtstunden pro Tag). Wird ueber das Kalender-Kontextmenue (PROJ-4) aufgerufen. Eintraege koennen erstellt, bearbeitet und geloescht werden.
+
+## Abhaengigkeiten
+- Benoetigt: PROJ-1 (Benutzer-Authentifizierung) — fuer User-ID
+- Benoetigt: PROJ-2 (Rollen- und Benutzerverwaltung) — fuer RLS-Policies
+- Benoetigt: PROJ-4 (Interaktiver Kalender) — fuer Kontextmenue-Integration und Kalender-Update
+
+## User Stories
+
+### US-1: Stunden erfassen
+Als Mitarbeiter moechte ich meine Arbeitsstunden fuer einen Tag erfassen, um meine Arbeitszeit zu dokumentieren.
+
+### US-2: Stunden bearbeiten
+Als Mitarbeiter moechte ich bereits erfasste Stunden bearbeiten koennen, falls ich einen Fehler gemacht habe.
+
+### US-3: Stunden loeschen
+Als Mitarbeiter moechte ich erfasste Stunden loeschen koennen, falls ein Eintrag falsch war.
+
+## Acceptance Criteria
+
+### Erfassungs-Dialog
+- [ ] Dialog/Modal oeffnet sich aus dem Kalender-Kontextmenue ("Arbeitszeit erfassen")
+- [ ] Dialog zeigt das ausgewaehlte Datum an (nicht editierbar)
+- [ ] Eingabefeld fuer Gesamtstunden (z.B. 8, 4.5, 7.5)
+- [ ] Optionales Kommentarfeld (z.B. "Home Office", "Aussendienst")
+- [ ] "Speichern"-Button und "Abbrechen"-Button
+- [ ] Loading-State auf dem Speichern-Button waehrend der Anfrage
+
+### Validierung
+- [ ] Stunden muessen zwischen 0 und 24 liegen
+- [ ] Maximal 1 Dezimalstelle erlaubt (z.B. 8.5 ja, 8.25 nein)
+- [ ] Stunden-Feld ist Pflichtfeld
+- [ ] Fehlermeldung bei ungueltiger Eingabe
+
+### Bearbeiten
+- [ ] Wenn fuer den Tag bereits ein Eintrag existiert, wird der Dialog im Bearbeitungsmodus geoeffnet
+- [ ] Vorhandene Stunden und Kommentar werden vorausgefuellt
+- [ ] Aenderungen koennen gespeichert werden
+
+### Loeschen
+- [ ] Im Bearbeitungsmodus gibt es einen "Loeschen"-Button
+- [ ] Bestaetigungsdialog vor dem Loeschen ("Eintrag wirklich loeschen?")
+- [ ] Nach dem Loeschen wird der Kalender aktualisiert (gruene Markierung verschwindet)
+
+### Feedback und Kalender-Update
+- [ ] Erfolgsmeldung (Toast) nach Speichern: "Arbeitszeit gespeichert"
+- [ ] Erfolgsmeldung (Toast) nach Loeschen: "Eintrag geloescht"
+- [ ] Fehlermeldung (Toast) bei Netzwerkfehler: "Fehler beim Speichern"
+- [ ] Kalender aktualisiert sich nach dem Speichern (Tag wird gruen markiert)
+
+### Datenbank (Tabelle `time_entries`)
+- [ ] Felder: id, user_id, datum, stunden, kommentar, created_at, updated_at
+- [ ] RLS: User kann nur eigene Eintraege erstellen/lesen/bearbeiten/loeschen
+- [ ] RLS: Manager kann Eintraege seines Teams lesen
+- [ ] Unique Constraint: Nur ein Eintrag pro User pro Tag
+
+## Edge Cases
+
+- **EC-1: Doppelter Eintrag** — Was passiert bei doppeltem Eintrag fuer denselben Tag? → Unique Constraint verhindert dies, Dialog oeffnet sich im Bearbeitungsmodus
+- **EC-2: Netzwerkfehler** — Was passiert wenn Netzwerkfehler beim Speichern auftritt? → Fehlermeldung, Daten bleiben im Formular, User kann erneut versuchen
+- **EC-3: Zukunft** — Darf ein Mitarbeiter Stunden fuer die Zukunft eintragen? → Nein, nur fuer heute und vergangene Tage
+- **EC-4: Weit zurueckliegende Tage** — Koennen Stunden fuer weit zurueckliegende Tage eingetragen werden? → Ja, aber maximal 3 Monate zurueck (konfigurierbar)
+- **EC-5: Wochenende** — Koennen Stunden am Wochenende eingetragen werden? → Ja, fuer Ueberstunden/Bereitschaft
+- **EC-6: Konflikte** — Was passiert wenn fuer denselben Tag eine Krankmeldung existiert? → Warnung anzeigen, aber nicht blockieren
+
+## Technische Hinweise
+- shadcn/ui Dialog fuer das Modal
+- shadcn/ui Input + Label fuer Formularfelder
+- shadcn/ui AlertDialog fuer Loeschbestaetigung
+- shadcn/ui Button fuer Aktionen
+- Sonner/Toast fuer Feedback
+- Zod fuer Input-Validierung
+- Supabase Tabelle `time_entries` mit RLS

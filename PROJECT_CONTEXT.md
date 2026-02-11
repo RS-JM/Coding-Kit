@@ -1,14 +1,14 @@
-# AI Coding Starter Kit
+# Zeiterfassungs-App
 
-> A Next.js template with an AI-powered development workflow using 6 specialized agents
+> Mitarbeiter-Zeiterfassung mit Login, Dashboard, Kalender und Abwesenheitsverwaltung
 
 ## Vision
-Build web applications faster with AI agents handling Requirements, Architecture, Development, QA, and Deployment. Each agent has clear responsibilities and a human-in-the-loop workflow for quality control.
+Eine Zeiterfassungs-App fuer Mitarbeiter mit 3 Rollen (Mitarbeiter, Manager, Admin). Mitarbeiter erfassen Arbeitsstunden, beantragen Urlaub und melden Krankheitstage. Manager genehmigen Urlaubsantraege. Admins verwalten Benutzerkonten und Urlaubskontingente.
 
 ---
 
 ## Aktueller Status
-Template ready - Start by defining your first feature!
+Feature-Spezifikationen erstellt — Naechster Schritt: Solution Architect fuer PROJ-1
 
 ---
 
@@ -32,16 +32,38 @@ Template ready - Start by defining your first feature!
 
 ## Features Roadmap
 
-### Your Features Will Appear Here
+### Phase 1 — MVP
 
-Start by defining your first feature using the Requirements Engineer agent:
-```
-Read .claude/agents/requirements-engineer.md and create a feature spec for [your feature idea]
-```
+| ID | Feature | Status | Spec |
+|----|---------|--------|------|
+| PROJ-1 | Benutzer-Authentifizierung (Login/Logout/PW-Reset) | 🔵 Planned | [Spec](/features/PROJ-1-benutzer-authentifizierung.md) |
+| PROJ-2 | Rollen- und Benutzerverwaltung (Datenmodell) | 🔵 Planned | [Spec](/features/PROJ-2-rollen-benutzerverwaltung.md) |
+| PROJ-3 | Dashboard-Layout und Benutzerinfo | 🔵 Planned | [Spec](/features/PROJ-3-dashboard-layout.md) |
+| PROJ-4 | Interaktiver Kalender | 🔵 Planned | [Spec](/features/PROJ-4-interaktiver-kalender.md) |
+| PROJ-5 | Arbeitszeiterfassung | 🔵 Planned | [Spec](/features/PROJ-5-arbeitszeiterfassung.md) |
+| PROJ-6 | Urlaubsanzeige im Dashboard | 🔵 Planned | [Spec](/features/PROJ-6-urlaubsanzeige-dashboard.md) |
 
-Example roadmap structure:
-- [PROJ-1] Your First Feature → 🔵 Planned → [Spec](/features/PROJ-1-feature-name.md)
-- [PROJ-2] Your Second Feature → ⚪ Backlog
+### Phase 2 — Abwesenheitsverwaltung
+
+| ID | Feature | Status | Spec |
+|----|---------|--------|------|
+| PROJ-7 | Urlaubsantrag stellen (Mitarbeiter) | 🔵 Planned | [Spec](/features/PROJ-7-urlaubsantrag.md) |
+| PROJ-8 | Urlaubsgenehmigung (Manager) | 🔵 Planned | [Spec](/features/PROJ-8-urlaubsgenehmigung.md) |
+| PROJ-9 | Krankmeldung eintragen | 🔵 Planned | [Spec](/features/PROJ-9-krankmeldung.md) |
+
+### Phase 3 — Administration
+
+| ID | Feature | Status | Spec |
+|----|---------|--------|------|
+| PROJ-10 | Admin-Benutzerverwaltung | 🔵 Planned | [Spec](/features/PROJ-10-admin-benutzerverwaltung.md) |
+
+### Implementierungsreihenfolge
+
+```
+PROJ-1 (Auth) → PROJ-2 (Rollen) → PROJ-3 (Dashboard) → PROJ-4 + PROJ-6 (parallel) → PROJ-5 (Zeiterfassung)
+Danach: PROJ-7 → PROJ-8 → PROJ-9
+Zuletzt: PROJ-10
+```
 
 ---
 
@@ -179,20 +201,21 @@ ai-coding-starter-kit/
 
 ## Next Steps
 
-1. **Define your first feature idea**
-   - Think about what you want to build
+1. **Solution Architect fuer PROJ-1 starten**
+   - Tell Claude: "Read `.claude/agents/solution-architect.md` and design the architecture for PROJ-1"
+   - Database Schema, Component Architecture, Tech-Entscheidungen
 
-2. **Start with Requirements Engineer**
-   - Tell Claude: "Read .claude/agents/requirements-engineer.md and create a feature spec for [your idea]"
-   - The agent will ask clarifying questions and create a detailed spec
+2. **MVP implementieren (Phase 1: PROJ-1 bis PROJ-6)**
+   - Reihenfolge: Auth → Rollen → Dashboard → Kalender + Urlaubsanzeige → Zeiterfassung
+   - Jedes Feature durchlaeuft: Architecture → Development → QA → Deployment
 
-3. **Follow the AI Agent workflow**
-   - Requirements → Architecture → Development → QA → Deployment
-   - Each agent knows when to hand off to the next agent
+3. **Phase 2 und 3 nach MVP-Abschluss**
+   - Abwesenheitsverwaltung (PROJ-7 bis PROJ-9)
+   - Administration (PROJ-10)
 
 4. **Track progress via Git**
-   - Feature specs in `/features/PROJ-X.md` show status (Planned → In Progress → Deployed)
-   - Git commits track all implementation details
+   - Feature specs in `/features/PROJ-X.md` zeigen Status (Planned → In Development → Done)
+   - Git commits tracken alle Implementierungsdetails
    - Use `git log --grep="PROJ-X"` to see feature history
 
 ---
