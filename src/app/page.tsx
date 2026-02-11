@@ -4,7 +4,7 @@ import { UserMenu } from '@/components/user-menu'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Calendar, Palmtree, Clock, ClipboardList, FolderOpen, History } from 'lucide-react'
+import { Calendar, Palmtree, Clock, ClipboardList, FolderOpen, History, LayoutDashboard, Users, ShieldCheck } from 'lucide-react'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -90,28 +90,73 @@ export default async function DashboardPage() {
       <div className="flex min-h-[calc(100vh-4rem)]">
         {/* Navigation Sidebar */}
         <nav className="hidden w-56 shrink-0 border-r bg-background p-4 lg:block">
-          <ul className="space-y-1">
-            {[
-              { label: 'Timesheet', icon: ClipboardList, href: '#' },
-              { label: 'Kalender', icon: Calendar, href: '#', active: true },
-              { label: 'Akten', icon: FolderOpen, href: '#' },
-              { label: 'Historie', icon: History, href: '#' },
-            ].map((item) => (
-              <li key={item.label}>
-                <a
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
-                    item.active
-                      ? 'bg-muted text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="flex h-full flex-col">
+            <ul className="space-y-1">
+              {[
+                { label: 'Übersicht', icon: LayoutDashboard, href: '/', active: true },
+                { label: 'Timesheet', icon: ClipboardList, href: '#' },
+                { label: 'Kalender', icon: Calendar, href: '#' },
+                { label: 'Akten', icon: FolderOpen, href: '#' },
+                { label: 'Historie', icon: History, href: '#' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
+                      item.active
+                        ? 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            {/* Rollenbasierte Navigation */}
+            {(profile?.rolle === 'manager' || profile?.rolle === 'admin') && (
+              <>
+                <Separator className="my-4" />
+                <ul className="space-y-1">
+                  {profile.rolle === 'manager' && (
+                    <li>
+                      <a
+                        href="#"
+                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        <Users className="h-4 w-4" />
+                        Team
+                      </a>
+                    </li>
+                  )}
+                  {profile.rolle === 'admin' && (
+                    <>
+                      <li>
+                        <a
+                          href="#"
+                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <Users className="h-4 w-4" />
+                          Team
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#"
+                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <ShieldCheck className="h-4 w-4" />
+                          Verwaltung
+                        </a>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </>
+            )}
+          </div>
         </nav>
 
         {/* Main Content */}

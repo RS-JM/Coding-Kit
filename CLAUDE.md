@@ -61,7 +61,7 @@ Employee time tracking app with 3 roles: **Mitarbeiter** (employee), **Manager**
 ### Dashboard Architecture
 
 - **Header:** Logo + title, date/role badge, user name + avatar with dropdown menu (Profil, Einstellungen, Abmelden)
-- **Left sidebar:** Navigation links (Timesheet, Kalender, Akten, Historie) — fixed width, hidden on mobile
+- **Left sidebar:** Navigation links (Übersicht, Timesheet, Kalender, Akten, Historie) + role-based entries (Team for manager, Team+Verwaltung for admin) — fixed width, hidden on mobile
 - **Main content:** Grid layout with calendar (~80%) and Urlaub widget (~20%)
 - **Components:** `UserMenu` (client, avatar dropdown), dashboard page is a Server Component
 - Greeting changes by time of day (Guten Morgen/Tag/Abend)
