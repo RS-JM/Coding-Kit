@@ -1,6 +1,14 @@
 # PROJ-8: Urlaubsgenehmigung (Manager)
 
-## Status: 🔵 Planned
+## Status: ✅ Implemented
+
+**Implementiert am:** 2026-02-15
+**Änderungen:**
+- Migration `007-vacation-rejection-reason.sql` hinzugefügt (Feld für Ablehnungsgrund)
+- API-Endpunkt `/api/vacation-requests/[id]/approve` für Genehmigung/Ablehnung
+- Manager-Seite `/manager/urlaub` mit Tabelle und Filterung
+- Komponente `VacationRequestsTable` mit Approve/Reject-Funktionalität
+- Navigation zur Manager-Seite im Sidebar (nur für Manager/Admin sichtbar)
 
 ## Beschreibung
 Manager-Ansicht zum Genehmigen oder Ablehnen von Urlaubsantraegen der Teammitglieder. Zeigt offene Antraege mit Details und ermoeglicht Genehmigung oder Ablehnung mit optionaler Begruendung.
@@ -26,31 +34,31 @@ Als Manager moechte ich eine Uebersicht aller Antraege sehen (offen, genehmigt, 
 ## Acceptance Criteria
 
 ### Manager-Bereich
-- [ ] Eigener Bereich/Tab im Dashboard (nur sichtbar fuer Manager und Admin)
-- [ ] Liste aller offenen Urlaubsantraege
-- [ ] Jeder Antrag zeigt: Mitarbeitername, Zeitraum, Anzahl Arbeitstage, Kommentar, Antragsdatum
+- [x] Eigener Bereich/Tab im Dashboard (nur sichtbar fuer Manager und Admin)
+- [x] Liste aller offenen Urlaubsantraege
+- [x] Jeder Antrag zeigt: Mitarbeitername, Zeitraum, Anzahl Arbeitstage, Kommentar, Antragsdatum
 
 ### Genehmigung
-- [ ] "Genehmigen"-Button pro Antrag
-- [ ] Nach Genehmigung: Status wird auf `genehmigt` gesetzt
-- [ ] Kalender des Mitarbeiters zeigt genehmigte Tage blau (PROJ-4)
-- [ ] Urlaubsanzeige des Mitarbeiters wird aktualisiert (PROJ-6)
+- [x] "Genehmigen"-Button pro Antrag
+- [x] Nach Genehmigung: Status wird auf `genehmigt` gesetzt
+- [x] Kalender des Mitarbeiters zeigt genehmigte Tage blau (PROJ-4)
+- [x] Urlaubsanzeige des Mitarbeiters wird aktualisiert (PROJ-6)
 
 ### Ablehnung
-- [ ] "Ablehnen"-Button pro Antrag
-- [ ] Dialog fuer Ablehnungsgrund (Pflichtfeld)
-- [ ] Nach Ablehnung: Status wird auf `abgelehnt` gesetzt
-- [ ] Mitarbeiter sieht den Ablehnungsgrund
+- [x] "Ablehnen"-Button pro Antrag
+- [x] Dialog fuer Ablehnungsgrund (Pflichtfeld)
+- [x] Nach Ablehnung: Status wird auf `abgelehnt` gesetzt
+- [x] Mitarbeiter sieht den Ablehnungsgrund
 
 ### Filter und Sortierung
-- [ ] Filter nach Status: Alle / Offen / Genehmigt / Abgelehnt
-- [ ] Sortierung nach Antragsdatum (neueste zuerst)
-- [ ] Badge mit Anzahl offener Antraege
+- [x] Filter nach Status: Alle / Offen / Genehmigt / Abgelehnt
+- [x] Sortierung nach Antragsdatum (neueste zuerst)
+- [x] Badge mit Anzahl offener Antraege
 
 ### Sicherheit
-- [ ] Nur User mit Rolle `manager` oder `admin` haben Zugriff
-- [ ] RLS-Policies stellen sicher, dass Manager nur Antraege sehen koennen
-- [ ] Admin sieht alle Antraege
+- [x] Nur User mit Rolle `manager` oder `admin` haben Zugriff
+- [x] RLS-Policies stellen sicher, dass Manager nur Antraege sehen koennen
+- [x] Admin sieht alle Antraege
 
 ## Edge Cases
 
@@ -66,3 +74,43 @@ Als Manager moechte ich eine Uebersicht aller Antraege sehen (offen, genehmigt, 
 - shadcn/ui Tabs fuer Filter
 - shadcn/ui Button fuer Aktionen
 - RLS-Policies muessen Manager-Rolle pruefen
+
+## Testing
+
+### Voraussetzungen
+1. Migration `007-vacation-rejection-reason.sql` in Supabase ausfuehren
+2. Mindestens 2 Benutzer: 1x Manager/Admin, 1x Mitarbeiter
+3. Mitarbeiter hat Urlaubsantrag gestellt (Status: `beantragt`)
+
+### Test-Szenarien
+
+#### TS-1: Manager-Zugriff
+- Als Manager einloggen
+- Im Sidebar sollte "Urlaubsanträge" sichtbar sein
+- Auf "Urlaubsanträge" klicken → Manager-Seite öffnet sich
+- **Erwartung:** Seite zeigt alle Urlaubsanträge mit Stats (Offen/Genehmigt/Abgelehnt)
+
+#### TS-2: Urlaubsantrag genehmigen
+- Auf Manager-Seite einen offenen Antrag suchen
+- "Genehmigen"-Button klicken
+- **Erwartung:** Toast-Nachricht "Urlaubsantrag genehmigt", Status wechselt auf "Genehmigt" (grün)
+- Kalender des Mitarbeiters prüfen → Tage sollten blau markiert sein
+- Urlaubswidget des Mitarbeiters prüfen → "Genommen" sollte aktualisiert sein
+
+#### TS-3: Urlaubsantrag ablehnen
+- Auf Manager-Seite einen offenen Antrag suchen
+- "Ablehnen"-Button klicken → Dialog öffnet sich
+- Ablehnungsgrund eingeben (z.B. "Zu viele Kollegen im Urlaub")
+- "Ablehnen" klicken
+- **Erwartung:** Toast-Nachricht "Urlaubsantrag abgelehnt", Status wechselt auf "Abgelehnt" (rot)
+- In der Tabelle sollte der Ablehnungsgrund in der Kommentar-Spalte angezeigt werden
+
+#### TS-4: Filter testen
+- Tabs "Alle", "Offen", "Genehmigt", "Abgelehnt" durchklicken
+- **Erwartung:** Tabelle zeigt nur Anträge mit dem entsprechenden Status
+
+#### TS-5: Mitarbeiter-Zugriff testen
+- Als Mitarbeiter einloggen
+- Im Sidebar sollte "Urlaubsanträge" NICHT sichtbar sein
+- Direkt zu `/manager/urlaub` navigieren
+- **Erwartung:** Redirect zu `/` (Dashboard)

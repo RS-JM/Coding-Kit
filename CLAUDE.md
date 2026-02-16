@@ -44,9 +44,18 @@ Employee time tracking app with 3 roles: **Mitarbeiter** (employee), **Manager**
 
 ### Database
 
-- SQL migrations in `supabase/` — run in Supabase SQL Editor
+- SQL migrations in `supabase/` — run manually in Supabase SQL Editor
 - `profiles` table: id (FK to auth.users), email, vorname, nachname, job_titel, rolle, urlaubstage_gesamt, ist_aktiv, failed_login_attempts, is_locked
+- `time_entries` table: id, user_id, datum (unique per user), stunden (0–24), arbeitsort (office/homeoffice/remote/kunde), kommentar
 - RLS policies enforce row-level security per role
+- `handle_updated_at()` trigger function reused across tables
+
+### API Endpoints
+
+- `GET /api/profile` — current user profile
+- `GET /api/profiles` — all profiles (manager/admin only), `PATCH /api/profiles/[id]` — update profile (admin only)
+- `GET /api/time-entries?von=&bis=` — user's entries for date range, `POST /api/time-entries` — create entry
+- `PATCH /api/time-entries/[id]` — update entry, `DELETE /api/time-entries/[id]` — delete entry
 
 ## AI Agent Workflow
 
@@ -66,11 +75,25 @@ Employee time tracking app with 3 roles: **Mitarbeiter** (employee), **Manager**
 - **Components:** `UserMenu` (client, avatar dropdown), dashboard page is a Server Component
 - Greeting changes by time of day (Guten Morgen/Tag/Abend)
 
+### Calendar Architecture
+
+- `MonthCalendar` (client component): weekly view (default) + monthly view with toggle, navigation (prev/next/today)
+- **Single click** on a day → DropdownMenu (Arbeitszeit/Krankmeldung/Urlaub)
+- **Drag-to-select** multiple days → SelectionBar with action buttons for bulk entry
+- Controlled DropdownMenu with invisible trigger (`pointer-events-none`) to avoid conflict with drag events
+- `useRef` for drag state (isDragging, dragStartDate, didDrag) to avoid re-renders during drag
+- Document-level `mouseup` listener for when mouse leaves calendar during drag
+- Entries fetched per visible date range via `GET /api/time-entries`, displayed as green badges (week view) or green dots (month view)
+- `calendar-dialogs.tsx`: WorkTimeDialog (API-connected, edit/delete mode), SickLeaveDialog, VacationDialog (both still toast-only)
+- `vacation-widget.tsx`: Server Component showing remaining vacation days with color-coded progress bar
+
 ### Current Status
 
-PROJ-1 (Auth) and PROJ-2 (Roles) are implemented. PROJ-3 (Dashboard Layout) is in development. Next: PROJ-4 (Calendar) + PROJ-6 (Vacation display).
+Implemented: PROJ-1 (Auth), PROJ-2 (Roles), PROJ-3 (Dashboard), PROJ-4 (Kalender), PROJ-5 (Arbeitszeiterfassung), PROJ-6 (Urlaubsanzeige)
 
-Implementation order: `PROJ-1 → PROJ-2 → PROJ-3 → PROJ-4 + PROJ-6 → PROJ-5 → PROJ-7 → PROJ-8 → PROJ-9 → PROJ-10`
+Next: PROJ-7 (Urlaubsantrag) → PROJ-8 (Urlaubsgenehmigung) → PROJ-9 (Krankmeldung) → PROJ-10 (Admin-Benutzerverwaltung)
+
+Future: Outlook Sync (noted, not spec'd yet)
 
 ## Conventions
 

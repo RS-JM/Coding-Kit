@@ -3,18 +3,9 @@ import { redirect } from 'next/navigation'
 import { UserMenu } from '@/components/user-menu'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { MonthCalendar } from '@/components/month-calendar'
-import { VacationWidget } from '@/components/vacation-widget'
 import { Calendar, Clock, ClipboardList, FolderOpen, History, LayoutDashboard, Users, Thermometer } from 'lucide-react'
-
-function getGreeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Guten Morgen'
-  if (hour < 18) return 'Guten Tag'
-  return 'Guten Abend'
-}
+import Link from 'next/link'
 
 function getInitials(vorname?: string | null, nachname?: string | null): string {
   const v = vorname?.charAt(0)?.toUpperCase() ?? ''
@@ -22,16 +13,12 @@ function getInitials(vorname?: string | null, nachname?: string | null): string 
   return v + n || '?'
 }
 
-function formatDate(): string {
-  return new Date().toLocaleDateString('de-DE', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+interface DashboardLayoutProps {
+  children: React.ReactNode
+  currentPath?: string
 }
 
-export default async function DashboardPage() {
+export async function DashboardLayout({ children, currentPath = '/' }: DashboardLayoutProps) {
   const supabase = await createServerSupabaseClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -40,48 +27,17 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile } = await supabase
     .from('profiles')
-    .select('vorname, nachname, job_titel, rolle, urlaubstage_gesamt')
+    .select('vorname, nachname, job_titel, rolle')
     .eq('id', user.id)
     .single()
 
-  // Fetch vacation data for the current year
-  const currentYear = new Date().getFullYear()
-  const { data: vacationData } = await supabase
-    .from('vacation_requests')
-    .select('arbeitstage, status')
-    .eq('user_id', user.id)
-    .gte('start_datum', `${currentYear}-01-01`)
-    .lte('start_datum', `${currentYear}-12-31`)
-    .in('status', ['beantragt', 'genehmigt'])
+  const displayName = profile?.vorname && profile?.nachname
+    ? `${profile.vorname} ${profile.nachname}`
+    : user.email ?? 'Benutzer'
 
-  const urlaubstageGenommen = (vacationData ?? [])
-    .filter((r) => r.status === 'genehmigt')
-    .reduce((sum, r) => sum + r.arbeitstage, 0)
-  const urlaubstageBeantragt = (vacationData ?? [])
-    .filter((r) => r.status === 'beantragt')
-    .reduce((sum, r) => sum + r.arbeitstage, 0)
-
-  // Fetch rejected vacation requests (for feedback)
-  const { data: rejectedVacations } = await supabase
-    .from('vacation_requests')
-    .select('id, start_datum, end_datum, ablehnungsgrund')
-    .eq('user_id', user.id)
-    .eq('status', 'abgelehnt')
-    .gte('start_datum', `${currentYear}-01-01`)
-    .lte('start_datum', `${currentYear}-12-31`)
-    .order('created_at', { ascending: false })
-
-  // Fetch approved vacation requests
-  const { data: approvedVacations } = await supabase
-    .from('vacation_requests')
-    .select('id, start_datum, end_datum')
-    .eq('user_id', user.id)
-    .eq('status', 'genehmigt')
-    .gte('start_datum', `${currentYear}-01-01`)
-    .lte('start_datum', `${currentYear}-12-31`)
-    .order('start_datum', { ascending: true })
+  const jobTitle = profile?.job_titel || 'Mitarbeiter'
 
   // Fetch pending counts for managers and admins
   let pendingVacationCount = 0
@@ -131,11 +87,13 @@ export default async function DashboardPage() {
     }
   }
 
-  const displayName = profile?.vorname && profile?.nachname
-    ? `${profile.vorname} ${profile.nachname}`
-    : user.email ?? 'Benutzer'
-
-  const jobTitle = profile?.job_titel || 'Mitarbeiter'
+  const navigationItems = [
+    { label: 'Übersicht', icon: LayoutDashboard, href: '/', active: currentPath === '/' },
+    { label: 'Timesheet', icon: ClipboardList, href: '#' },
+    { label: 'Kalender', icon: Calendar, href: '#' },
+    { label: 'Akten', icon: FolderOpen, href: '#' },
+    { label: 'Historie', icon: History, href: '#' },
+  ]
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -182,15 +140,9 @@ export default async function DashboardPage() {
         <nav className="hidden w-56 shrink-0 border-r bg-background p-4 lg:block">
           <div className="flex h-full flex-col">
             <ul className="space-y-1">
-              {[
-                { label: 'Übersicht', icon: LayoutDashboard, href: '/', active: true },
-                { label: 'Timesheet', icon: ClipboardList, href: '#' },
-                { label: 'Kalender', icon: Calendar, href: '#' },
-                { label: 'Akten', icon: FolderOpen, href: '#' },
-                { label: 'Historie', icon: History, href: '#' },
-              ].map((item) => (
+              {navigationItems.map((item) => (
                 <li key={item.label}>
-                  <a
+                  <Link
                     href={item.href}
                     className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
                       item.active
@@ -200,7 +152,7 @@ export default async function DashboardPage() {
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -213,9 +165,13 @@ export default async function DashboardPage() {
                   {(profile.rolle === 'manager' || profile.rolle === 'admin') && (
                     <>
                       <li>
-                        <a
+                        <Link
                           href="/manager/urlaub"
-                          className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          className={`flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground ${
+                            currentPath === '/manager/urlaub'
+                              ? 'bg-muted text-foreground'
+                              : 'text-muted-foreground'
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <Calendar className="h-4 w-4" />
@@ -226,12 +182,16 @@ export default async function DashboardPage() {
                               {pendingVacationCount}
                             </Badge>
                           )}
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href={profile.rolle === 'admin' ? '/admin/krankheit' : '/manager/krankheit'}
-                          className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          className={`flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground ${
+                            currentPath === '/manager/krankheit' || currentPath === '/admin/krankheit'
+                              ? 'bg-muted text-foreground'
+                              : 'text-muted-foreground'
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <Thermometer className="h-4 w-4" />
@@ -242,19 +202,23 @@ export default async function DashboardPage() {
                               {pendingSickLeaveCount}
                             </Badge>
                           )}
-                        </a>
+                        </Link>
                       </li>
                     </>
                   )}
                   {profile.rolle === 'admin' && (
                     <li>
-                      <a
+                      <Link
                         href="/admin/users"
-                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground ${
+                          currentPath === '/admin/users'
+                            ? 'bg-muted text-foreground'
+                            : 'text-muted-foreground'
+                        }`}
                       >
                         <Users className="h-4 w-4" />
                         Benutzerverwaltung
-                      </a>
+                      </Link>
                     </li>
                   )}
                 </ul>
@@ -264,37 +228,8 @@ export default async function DashboardPage() {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
-          {/* Begrüßung */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold">
-              {getGreeting()}, {profile?.vorname || 'Benutzer'}
-            </h2>
-            <p className="text-muted-foreground">{formatDate()}</p>
-          </div>
-
-          {/* Fehler-State für Profil */}
-          {profileError && (
-            <Card className="mb-6 border-destructive">
-              <CardContent className="pt-6">
-                <p className="text-sm text-destructive">
-                  Profildaten konnten nicht geladen werden. Bitte lade die Seite neu.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Dashboard Grid: Kalender ~80% | Urlaub-Widget ~20% */}
-          <div className="grid gap-6 xl:grid-cols-5">
-            <MonthCalendar />
-            <VacationWidget
-              urlaubstageGesamt={profile?.urlaubstage_gesamt ?? 30}
-              urlaubstageGenommen={urlaubstageGenommen}
-              urlaubstageBeantragt={urlaubstageBeantragt}
-              rejectedVacations={rejectedVacations ?? []}
-              approvedVacations={approvedVacations ?? []}
-            />
-          </div>
+        <main className="flex-1">
+          {children}
         </main>
       </div>
     </div>

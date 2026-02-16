@@ -1,6 +1,6 @@
 # PROJ-5: Arbeitszeiterfassung
 
-## Status: 🔵 Planned
+## Status: 🟢 In Development
 
 ## Beschreibung
 Formular zum Erfassen der taeglichen Arbeitsstunden (Gesamtstunden pro Tag). Wird ueber das Kalender-Kontextmenue (PROJ-4) aufgerufen. Eintraege koennen erstellt, bearbeitet und geloescht werden.
@@ -76,3 +76,50 @@ Als Mitarbeiter moechte ich erfasste Stunden loeschen koennen, falls ein Eintrag
 - Sonner/Toast fuer Feedback
 - Zod fuer Input-Validierung
 - Supabase Tabelle `time_entries` mit RLS
+
+## Tech-Design (Solution Architect)
+
+### Component-Struktur
+```
+Dashboard (page.tsx)
+└── MonthCalendar (Client Component)
+    ├── Kalender-Zellen zeigen grüne Markierung bei vorhandenen Einträgen
+    │   ├── Wochenansicht: "8h Office" Badge in der Zelle
+    │   └── Monatsansicht: grüner Punkt unter dem Datum
+    ├── Klick auf Tag → WorkTimeDialog
+    │   ├── Neuer Eintrag: leeres Formular (Stunden, Arbeitsort, Kommentar)
+    │   └── Bestehender Eintrag: vorausgefüllt + Löschen-Button
+    └── Drag-Selektion → SelectionBar → WorkTimeDialog (Mehrfach-Eintrag)
+```
+
+### Daten-Model
+```
+Tabelle: time_entries
+- id (uuid, PK)
+- user_id (uuid, FK → auth.users)
+- datum (date, unique pro user)
+- stunden (numeric 0–24, Schritte 0.5)
+- arbeitsort (office | homeoffice | remote | kunde)
+- kommentar (text, optional)
+- created_at, updated_at (timestamptz)
+
+RLS: User CRUD eigene Einträge, Manager/Admin lesen alle
+```
+
+### API-Endpunkte
+```
+GET    /api/time-entries?von=YYYY-MM-DD&bis=YYYY-MM-DD
+POST   /api/time-entries
+PATCH  /api/time-entries/[id]
+DELETE /api/time-entries/[id]
+```
+
+### Tech-Entscheidungen
+- Supabase-Tabelle mit RLS (wie profiles-Pattern)
+- API Routes mit Zod-Validierung (wie /api/profiles Pattern)
+- WorkTimeDialog erweitert: Bearbeitungsmodus + AlertDialog für Löschen
+- Kalender lädt Einträge per useEffect beim Monat-/Wochenwechsel
+- fetchEntries wird als onSave-Callback an WorkTimeDialog übergeben
+
+### Dependencies
+Keine neuen Packages

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Loader2, AlertCircle, Mail, Lock, KeyRound } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -157,6 +158,9 @@ export default function LoginPage() {
   if (showResetForm) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+        <div className="fixed top-4 right-4">
+          <ThemeToggle />
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -243,6 +247,9 @@ export default function LoginPage() {
   // Login Formular
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Loader2, AlertCircle, KeyRound, CheckCircle2 } from 'lucide-react'
 
 const resetPasswordSchema = z
@@ -95,6 +96,9 @@ export default function ResetPasswordPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+        <div className="fixed top-4 right-4">
+          <ThemeToggle />
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -122,6 +126,9 @@ export default function ResetPasswordPage() {
   if (!isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+        <div className="fixed top-4 right-4">
+          <ThemeToggle />
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
@@ -146,6 +153,9 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
