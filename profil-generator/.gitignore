@@ -1,0 +1,24 @@
+.env
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Generierte Dateien (nicht einchecken)
+output/*.docx
+output/*.pdf
+
+# Hochgeladene Kandidatenprofile (Datenschutz!)
+uploads/
+
+# Templates werden eingecheckt (kein Datenschutzproblem)
+# templates/*.docx
+
+# Streamlit
+.streamlit/
